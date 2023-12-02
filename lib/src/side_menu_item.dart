@@ -2,7 +2,7 @@ import 'package:badges/badges.dart';
 import 'package:easy_sidemenu/src/global/global.dart';
 import 'package:easy_sidemenu/src/side_menu_display_mode.dart';
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Badge;
 
 class SideMenuItem extends StatefulWidget {
   /// #### Side Menu Item
@@ -84,9 +84,7 @@ class _SideMenuItemState extends State<SideMenuItem> {
   /// Set background color of [SideMenuItem]
   Color _setColor() {
     if (widget.priority == currentPage) {
-      return Global.style.selectedColor ?? Theme
-          .of(context)
-          .highlightColor;
+      return Global.style.selectedColor ?? Theme.of(context).highlightColor;
     } else if (isHovered) {
       return Global.style.hoverColor ?? Colors.transparent;
     } else {
@@ -152,11 +150,13 @@ class _SideMenuItemState extends State<SideMenuItem> {
                               widget.title,
                               style: widget.priority == currentPage.ceil()
                                   ? const TextStyle(
-                                  fontSize: 14, color: Colors.black)
-                                  .merge(Global.style.selectedTitleTextStyle)
+                                          fontSize: 14, color: Colors.black)
+                                      .merge(
+                                          Global.style.selectedTitleTextStyle)
                                   : const TextStyle(
-                                  fontSize: 14, color: Colors.black54)
-                                  .merge(Global.style.unselectedTitleTextStyle),
+                                          fontSize: 14, color: Colors.black54)
+                                      .merge(Global
+                                          .style.unselectedTitleTextStyle),
                             ),
                           ),
                       ],
@@ -183,11 +183,11 @@ class _SideMenuItemState extends State<SideMenuItem> {
         Visibility(
           visible: widget.showDividerLine,
           child: Padding(
-            padding: EdgeInsets.only(bottom: 5,right: 20,left: 20),
+            padding: EdgeInsets.only(bottom: 5, right: 20, left: 20),
             child: Divider(
-                height: 1, thickness: 1,
-                color: Colors.grey.withOpacity(0.3)),
-          ),)
+                height: 1, thickness: 1, color: Colors.grey.withOpacity(0.3)),
+          ),
+        )
       ],
     );
   }
