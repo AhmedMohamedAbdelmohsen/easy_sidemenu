@@ -17,9 +17,6 @@ class SideMenuStyle {
   /// Color of [SideMenuItem] when mouse hover on that
   Color? hoverColor;
 
-  /// Color of [SideMenuItem] when mouse hover on that and it was selected
-  Color? selectedHoverColor;
-
   /// You can use the [displayMode] property to configure different
   /// display modes for the [SideMenu]
   SideMenuDisplayMode? displayMode;
@@ -45,24 +42,6 @@ class SideMenuStyle {
   /// Color of toggle button
   Color? toggleColor;
 
-  /// Outer padding of menu item
-  EdgeInsetsGeometry itemOuterPadding;
-
-  /// Inner spacing of menu item
-  double itemInnerSpacing;
-
-  /// Height of menu item
-  double itemHeight;
-
-  /// Border Radius of menu item
-  BorderRadius itemBorderRadius;
-
-  /// Property that will show user itemName in
-  /// Tooltip when they'll hover over the item
-  /// This property will only work if current
-  /// [SideMenuDisplayMode] is set compact
-  bool showTooltip;
-
   /// Style class to configure [SideMenu]
   SideMenuStyle({
     this.openSideMenuWidth = 300,
@@ -70,7 +49,6 @@ class SideMenuStyle {
     this.backgroundColor,
     this.selectedColor,
     this.hoverColor = Colors.transparent,
-    this.selectedHoverColor,
     this.displayMode = SideMenuDisplayMode.auto,
     this.selectedTitleTextStyle,
     this.unselectedTitleTextStyle,
@@ -79,12 +57,5 @@ class SideMenuStyle {
     this.iconSize = 24,
     this.decoration,
     this.toggleColor = Colors.black54,
-    this.itemOuterPadding = const EdgeInsets.symmetric(horizontal: 5.0),
-    this.itemInnerSpacing = 8.0,
-    this.itemHeight = 50.0,
-    this.itemBorderRadius = const BorderRadius.all(
-      Radius.circular(5.0),
-    ),
-    this.showTooltip = true,
   });
 }

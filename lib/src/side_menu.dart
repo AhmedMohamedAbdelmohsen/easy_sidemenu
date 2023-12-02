@@ -1,23 +1,16 @@
+import 'package:easy_sidemenu/src/global/global.dart';
 import 'package:easy_sidemenu/src/side_menu_display_mode.dart';
 import 'package:easy_sidemenu/src/side_menu_item.dart';
 import 'package:easy_sidemenu/src/side_menu_style.dart';
 import 'package:easy_sidemenu/src/side_menu_toggle.dart';
-import 'package:easy_sidemenu/src/side_menu_item_with_global.dart';
-import 'package:easy_sidemenu/src/side_menu_controller.dart';
 import 'package:flutter/material.dart';
-import 'global/global.dart';
 
 class SideMenu extends StatefulWidget {
   /// Page controller to control [PageView] widget
-  final SideMenuController controller;
+  final PageController controller;
 
-  /// List of [SideMenuItem] on [SideMenu]
+  /// List of [SideMenuItem] to show them on [SideMenu]
   final List<SideMenuItem> items;
-
-  /// List of [SideMenuItemWithGlobal] on [SideMenu]
-  List<SideMenuItemWithGlobal> sidemenuitems = [];
-
-  Global global = Global();
 
   /// Title widget will shows on top of all items,
   /// it can be a logo or a Title text
@@ -34,155 +27,85 @@ class SideMenu extends StatefulWidget {
   /// If the display mode is auto, this button will not be displayed
   final bool? showToggle;
 
-  /// By default footer only shown when display mode is open
-  /// If you want always shown footer set it to true
-  final bool? alwaysShowFooter;
-
   /// Notify when [SideMenuDisplayMode] changed
   final ValueChanged<SideMenuDisplayMode>? onDisplayModeChanged;
-
-  /// Duration of [displayMode] toggling duration
-  final Duration? displayModeToggleDuration;
-
-  /// Width when will our open menu collapse into the compact one
-  final int? collapseWidth;
 
   /// ### Easy Sidemenu widget
   ///
   /// Sidemenu is a menu that is usually located
   /// on the left or right of the page and can used for navigation
-  SideMenu({
+  const SideMenu({
     Key? key,
     required this.items,
     required this.controller,
     this.title,
     this.footer,
     this.style,
-    this.showToggle = false,
+    this.showToggle,
     this.onDisplayModeChanged,
-    this.displayModeToggleDuration,
-    this.alwaysShowFooter = false,
-    this.collapseWidth = 600,
-  }) : super(key: key) {
-    this.global.style = this.style ?? SideMenuStyle();
-    this.global.controller = this.controller;
-    sidemenuitems = items
-        .map((data) => SideMenuItemWithGlobal(
-              global: this.global,
-              title: data.title ?? null,
-              onTap: data.onTap ?? null,
-              icon: data.icon ?? null,
-              iconWidget: data.iconWidget ?? null,
-              badgeContent: data.badgeContent ?? null,
-              badgeColor: data.badgeColor ?? null,
-              tooltipContent: data.tooltipContent ?? null,
-              trailing: data.trailing ?? null,
-              builder: data.builder ?? null,
-            ))
-        .toList();
-    this.global.items = this.sidemenuitems;
-  }
+  }) : super(key: key);
 
   @override
   State<SideMenu> createState() => _SideMenuState();
 }
 
 class _SideMenuState extends State<SideMenu> {
-  // late Global global;
-  double _currentWidth = 0;
+  double _currentWidth = 220;
   late bool showToggle;
-  late bool alwaysShowFooter;
-  late int collapseWidth;
-  bool animationInProgress = false;
 
   @override
   void initState() {
     super.initState();
     showToggle = widget.showToggle ?? false;
-    alwaysShowFooter = widget.alwaysShowFooter ?? false;
-    collapseWidth = widget.collapseWidth ?? 600;
-  }
-
-  @override
-  void didUpdateWidget(covariant SideMenu oldWidget) {
-    showToggle = widget.showToggle ?? false;
-    alwaysShowFooter = widget.alwaysShowFooter ?? false;
-    collapseWidth = widget.collapseWidth ?? 600;
-    widget.global.style = widget.style ?? SideMenuStyle();
-    super.didUpdateWidget(oldWidget);
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    _currentWidth = _widthSize(
-        widget.global.style.displayMode ?? SideMenuDisplayMode.auto, context);
   }
 
   void _notifyParent() {
     if (widget.onDisplayModeChanged != null) {
-      widget.onDisplayModeChanged!(widget.global.displayModeState.value);
+      widget.onDisplayModeChanged!(Global.displayModeState.value);
     }
   }
 
   /// Set [SideMenu] width according to displayMode and notify parent widget
   double _widthSize(SideMenuDisplayMode mode, BuildContext context) {
-    animationInProgress = false;
     if (mode == SideMenuDisplayMode.auto) {
-      if (MediaQuery.of(context).size.width > collapseWidth) {
-        if (widget.global.displayModeState.value != SideMenuDisplayMode.open) {
-          widget.global.displayModeState.change(SideMenuDisplayMode.open);
-          _notifyParent();
-          Future.delayed(_toggleDuration(), () {
-            widget.global.showTrailing = true;
-            for (var update in widget.global.itemsUpdate) {
-              update();
-            }
-            animationInProgress = false;
-          });
-        }
-        return widget.global.style.openSideMenuWidth ?? 300;
-      } else if (MediaQuery.sizeOf(context).width <= collapseWidth) {
-        if (widget.global.displayModeState.value !=
-            SideMenuDisplayMode.compact) {
-          widget.global.displayModeState.change(SideMenuDisplayMode.compact);
-          _notifyParent();
-          widget.global.showTrailing = false;
-        }
-
-        return widget.global.style.compactSideMenuWidth ?? 50;
+      if (MediaQuery
+          .of(context)
+          .size
+          .width > 600 &&
+          Global.displayModeState.value != SideMenuDisplayMode.open) {
+        Global.displayModeState.change(SideMenuDisplayMode.open);
+        _notifyParent();
+        return Global.style.openSideMenuWidth ?? 300;
+      }
+      if (MediaQuery
+          .of(context)
+          .size
+          .width <= 600 &&
+          Global.displayModeState.value != SideMenuDisplayMode.compact) {
+        Global.displayModeState.change(SideMenuDisplayMode.compact);
+        _notifyParent();
+        return Global.style.compactSideMenuWidth ?? 50;
       }
       return _currentWidth;
-    } else if (mode == SideMenuDisplayMode.open) {
-      if (widget.global.displayModeState.value != SideMenuDisplayMode.open) {
-        widget.global.displayModeState.change(SideMenuDisplayMode.open);
-        _notifyParent();
-        Future.delayed(_toggleDuration(), () {
-          widget.global.showTrailing = true;
-          for (var update in widget.global.itemsUpdate) {
-            update();
-          }
-          animationInProgress = false;
-        });
-      }
-      return widget.global.style.openSideMenuWidth ?? 300;
-    } else if (mode == SideMenuDisplayMode.compact) {
-      if (widget.global.displayModeState.value != SideMenuDisplayMode.compact) {
-        widget.global.displayModeState.change(SideMenuDisplayMode.compact);
-        _notifyParent();
-        widget.global.showTrailing = false;
-      }
-
-      return widget.global.style.compactSideMenuWidth ?? 50;
+    } else if (mode == SideMenuDisplayMode.open &&
+        Global.displayModeState.value != SideMenuDisplayMode.open) {
+      Global.displayModeState.change(SideMenuDisplayMode.open);
+      _notifyParent();
+      return Global.style.openSideMenuWidth ?? 300;
     }
-
+    if (mode == SideMenuDisplayMode.compact &&
+        Global.displayModeState.value != SideMenuDisplayMode.compact) {
+      Global.displayModeState.change(SideMenuDisplayMode.compact);
+      _notifyParent();
+      return Global.style.compactSideMenuWidth ?? 50;
+    }
     return _currentWidth;
   }
 
   Decoration _decoration(SideMenuStyle? menuStyle) {
     if (menuStyle == null || menuStyle.decoration == null) {
       return BoxDecoration(
-        color: widget.global.style.backgroundColor,
+        color: Global.style.backgroundColor,
       );
     } else {
       if (menuStyle.backgroundColor != null) {
@@ -193,96 +116,104 @@ class _SideMenuState extends State<SideMenu> {
     }
   }
 
-  Duration _toggleDuration() {
-    return widget.displayModeToggleDuration ??
-        const Duration(milliseconds: 350);
-  }
-
   @override
   Widget build(BuildContext context) {
-    widget.global.controller = widget.controller;
-    widget.global.items = widget.sidemenuitems;
-
+    Global.controller = widget.controller;
+    widget.items.sort((a, b) => a.priority.compareTo(b.priority));
+    Global.style = widget.style ?? SideMenuStyle();
     _currentWidth = _widthSize(
-        widget.global.style.displayMode ?? SideMenuDisplayMode.auto, context);
+        Global.style.displayMode ?? SideMenuDisplayMode.auto, context);
 
     return AnimatedContainer(
-      duration: _toggleDuration(),
+      duration: const Duration(milliseconds: 350),
       width: _currentWidth,
-      height: MediaQuery.sizeOf(context).height,
+      height: MediaQuery
+          .of(context)
+          .size
+          .height,
       decoration: _decoration(widget.style),
       child: Stack(
         children: [
           SingleChildScrollView(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (widget.global.style.displayMode ==
-                        SideMenuDisplayMode.compact &&
-                    showToggle)
-                  const SizedBox(
-                    height: 42,
-                  ),
-                if (widget.title != null) widget.title!,
-                ...widget.sidemenuitems,
+                // if (Global.style.displayMode == SideMenuDisplayMode.compact &&
+                //     showToggle)
+                (widget.title != null && Global.displayModeState.value ==
+                    SideMenuDisplayMode.open) ? SizedBox(
+                  height: 13.5,
+                ) : SizedBox(
+                  height: 18.5,
+                ),
+                Row(
+                  children: [
+                    if (widget.title != null && Global.displayModeState.value ==
+                        SideMenuDisplayMode.open)
+                      Expanded(
+                        child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Padding(
+                                padding: EdgeInsets.only(left: 15),
+                                child: widget.title!)
+                        ),
+                      ),
+                    Expanded(
+                      child: Align(alignment: Alignment.centerRight,
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal:
+                                Global.displayModeState.value ==
+                                    SideMenuDisplayMode.open
+                                    ? 0
+                                    : 4,
+                                vertical: 0),
+                            child: SideMenuToggle(
+                              onTap: () {
+                                if (showToggle) {
+                                  if (Global.displayModeState.value ==
+                                      SideMenuDisplayMode.compact) {
+                                    setState(() {
+                                      Global.style.displayMode =
+                                          SideMenuDisplayMode.open;
+                                    });
+                                  } else if (Global.displayModeState.value ==
+                                      SideMenuDisplayMode.open) {
+                                    setState(() {
+                                      Global.style.displayMode =
+                                          SideMenuDisplayMode.compact;
+                                    });
+                                  }
+                                }
+                              },
+                            ),
+                          )),
+                    )
+                  ],
+                ),
+                (widget.title != null && Global.displayModeState.value ==
+                    SideMenuDisplayMode.open) ? SizedBox(
+                  height: 13.5,
+                ) : SizedBox(
+                  height: 18.5,
+                ),
+                Divider(height: 1,
+                    thickness: 1,
+                    color: Colors.grey.withOpacity(0.5)),
+                const SizedBox(
+                  height: 16,
+                ),
+                ...widget.items,
               ],
             ),
           ),
-          if ((widget.footer != null &&
-                  widget.global.displayModeState.value !=
-                      SideMenuDisplayMode.compact) ||
-              (widget.footer != null && alwaysShowFooter))
+          if (widget.footer != null &&
+              Global.displayModeState.value != SideMenuDisplayMode.compact)
             Align(alignment: Alignment.bottomCenter, child: widget.footer!),
-          if (widget.global.style.displayMode != SideMenuDisplayMode.auto &&
-              showToggle)
-            Padding(
-              padding: EdgeInsets.symmetric(
-                  horizontal: widget.global.displayModeState.value ==
-                          SideMenuDisplayMode.open
-                      ? 0
-                      : 4,
-                  vertical: 0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  SideMenuToggle(
-                    global: widget.global,
-                    onTap: () {
-                      if (context
-                              .findAncestorStateOfType<_SideMenuState>()
-                              ?.animationInProgress ??
-                          false) {
-                        return;
-                      }
-                      if (widget.global.displayModeState.value ==
-                          SideMenuDisplayMode.compact) {
-                        setState(() {
-                          widget.global.style.displayMode =
-                              SideMenuDisplayMode.open;
-                        });
-                      } else if (widget.global.displayModeState.value ==
-                          SideMenuDisplayMode.open) {
-                        setState(() {
-                          widget.global.style.displayMode =
-                              SideMenuDisplayMode.compact;
-                        });
-                      }
-                    },
-                  ),
-                ],
-              ),
-            )
+          // if (Global.style.displayMode != SideMenuDisplayMode.auto &&
+          //     showToggle)
+
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    Future.delayed(Duration.zero, () {
-      widget.global.displayModeState
-          .change(widget.global.displayModeState.value);
-    });
-    super.dispose();
   }
 }

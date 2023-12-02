@@ -1,5 +1,5 @@
-import 'package:easy_sidemenu/easy_sidemenu.dart';
 import 'package:flutter/material.dart';
+import 'package:easy_sidemenu/easy_sidemenu.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,16 +31,7 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  PageController pageController = PageController();
-  SideMenuController sideMenu = SideMenuController();
-
-  @override
-  void initState() {
-    sideMenu.addListener((index) {
-      pageController.jumpToPage(index);
-    });
-    super.initState();
-  }
+  PageController page = PageController();
 
   @override
   Widget build(BuildContext context) {
@@ -53,12 +44,13 @@ class _MyHomePageState extends State<MyHomePage> {
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           SideMenu(
-            controller: sideMenu,
+            controller: page,
+            // onDisplayModeChanged: (mode) {
+            //   print(mode);
+            // },
             style: SideMenuStyle(
-              // showTooltip: false,
               displayMode: SideMenuDisplayMode.auto,
               hoverColor: Colors.blue[100],
-              selectedHoverColor: Colors.blue[100],
               selectedColor: Colors.lightBlue,
               selectedTitleTextStyle: const TextStyle(color: Colors.white),
               selectedIconColor: Colors.white,
@@ -84,104 +76,69 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ],
             ),
-            footer: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                decoration: BoxDecoration(
-                    color: Colors.lightBlue[100],
-                    borderRadius: BorderRadius.circular(12)),
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 4, horizontal: 10),
-                  child: Text(
-                    'mohada',
-                    style: TextStyle(fontSize: 15, color: Colors.grey[800]),
-                  ),
-                ),
+            footer: const Padding(
+              padding: EdgeInsets.all(8.0),
+              child: Text(
+                'mohada',
+                style: TextStyle(fontSize: 15),
               ),
             ),
             items: [
               SideMenuItem(
+                priority: 0,
                 title: 'Dashboard',
-                onTap: (index, _) {
-                  sideMenu.changePage(index);
+                onTap: () {
+                  page.jumpToPage(0);
                 },
                 icon: const Icon(Icons.home),
                 badgeContent: const Text(
                   '3',
                   style: TextStyle(color: Colors.white),
                 ),
-                tooltipContent: "This is a tooltip for Dashboard item",
               ),
               SideMenuItem(
+                priority: 1,
                 title: 'Users',
-                onTap: (index, _) {
-                  sideMenu.changePage(index);
+                onTap: () {
+                  page.jumpToPage(1);
                 },
                 icon: const Icon(Icons.supervisor_account),
               ),
               SideMenuItem(
+                priority: 2,
                 title: 'Files',
-                onTap: (index, _) {
-                  sideMenu.changePage(index);
+                onTap: () {
+                  page.jumpToPage(2);
                 },
                 icon: const Icon(Icons.file_copy_rounded),
-                trailing: Container(
-                    decoration: const BoxDecoration(
-                        color: Colors.amber,
-                        borderRadius: BorderRadius.all(Radius.circular(6))),
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 6.0, vertical: 3),
-                      child: Text(
-                        'New',
-                        style: TextStyle(fontSize: 11, color: Colors.grey[800]),
-                      ),
-                    )),
               ),
               SideMenuItem(
+                priority: 3,
                 title: 'Download',
-                onTap: (index, _) {
-                  sideMenu.changePage(index);
+                onTap: () {
+                  page.jumpToPage(3);
                 },
                 icon: const Icon(Icons.download),
               ),
               SideMenuItem(
-                builder: (context, displayMode) {
-                  return const Divider(
-                    endIndent: 8,
-                    indent: 8,
-                  );
-                },
-              ),
-              SideMenuItem(
+                priority: 4,
                 title: 'Settings',
-                onTap: (index, _) {
-                  sideMenu.changePage(index);
+                onTap: () {
+                  page.jumpToPage(4);
                 },
                 icon: const Icon(Icons.settings),
               ),
-              // SideMenuItem(
-              //   onTap:(index, _){
-              //     sideMenu.changePage(index);
-              //   },
-              //   icon: const Icon(Icons.image_rounded),
-              // ),
-              // SideMenuItem(
-              //   title: 'Only Title',
-              //   onTap:(index, _){
-              //     sideMenu.changePage(index);
-              //   },
-              // ),
-              const SideMenuItem(
+              SideMenuItem(
+                priority: 6,
                 title: 'Exit',
-                icon: Icon(Icons.exit_to_app),
+                onTap: () async {},
+                icon: const Icon(Icons.exit_to_app),
               ),
             ],
           ),
           Expanded(
             child: PageView(
-              controller: pageController,
+              controller: page,
               children: [
                 Container(
                   color: Colors.white,
@@ -224,24 +181,6 @@ class _MyHomePageState extends State<MyHomePage> {
                   child: const Center(
                     child: Text(
                       'Settings',
-                      style: TextStyle(fontSize: 35),
-                    ),
-                  ),
-                ),
-                Container(
-                  color: Colors.white,
-                  child: const Center(
-                    child: Text(
-                      'Only Title',
-                      style: TextStyle(fontSize: 35),
-                    ),
-                  ),
-                ),
-                Container(
-                  color: Colors.white,
-                  child: const Center(
-                    child: Text(
-                      'Only Icon',
                       style: TextStyle(fontSize: 35),
                     ),
                   ),
