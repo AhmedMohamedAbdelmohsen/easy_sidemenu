@@ -22,7 +22,7 @@ Sidemenu is similar to bottom navigation bar but in the side of screen and usual
 
 | Open                             | Compact                             |
 | -------------------------------- | ----------------------------------- |
-| ![Open](images/Screenshot_1.jpeg) | ![Compact](images/Screenshot_2.jpeg) |
+| ![Open](images/Screenshot_1.png) | ![Compact](images/Screenshot_2.png) |
 
 | Auto                              |
 | --------------------------------- |
@@ -38,7 +38,7 @@ You can see web demo here: [https://jamalianpour.github.io/easy_sidemenu](https:
 
 ```yaml
 dependencies:
-  easy_sidemenu: ^0.5.0
+  easy_sidemenu: ^0.3.1
 ```
 
 Run `flutter packages get` in the root directory of your app.
@@ -58,10 +58,10 @@ You must first define a list of items to display on `SideMenu`:
 ```dart
 List<SideMenuItem> items = [
   SideMenuItem(
+    // Priority of item to show on SideMenu, lower value is displayed at the top
+    priority: 0,
     title: 'Dashboard',
-    onTap: (index, _) {
-      sideMenu.changePage(index);
-    },
+    onTap: () => page.jumpToPage(0),
     icon: Icon(Icons.home),
     badgeContent: Text(
       '3',
@@ -69,13 +69,13 @@ List<SideMenuItem> items = [
     ),
   ),
   SideMenuItem(
+    priority: 1,
     title: 'Settings',
-    onTap: (index, _) {
-      sideMenu.changePage(index);
-    },
+    onTap: () => page.jumpToPage(1),
     icon: Icon(Icons.settings),
   ),
   SideMenuItem(
+    priority: 2,
     title: 'Exit',
     onTap: () {},
     icon: Icon(Icons.exit_to_app),
@@ -83,73 +83,51 @@ List<SideMenuItem> items = [
 ];
 ```
 
-###### custom builder:
+###### priority rule:
 
-Instead of `title` and `icon` in `SideMenuItem` can use `builder` to create your customize items:
-
-```dart
-SideMenuItem(
-  builder: (context, displayMode) {
-    return Container();
-  },
-  onTap: () {},
-),
-```
+- Priority should start from 0
+- Priority value should be unique
 
 After that you need to warp your main page to a `row` and then add `SideMenu` as first child of that, like below:
 
 ```dart
-PageController pageController = PageController();
-SideMenuController sideMenu = SideMenuController();
-
-@override
-void initState() {
-  // Connect SideMenuController and PageController together
-  sideMenu.addListener((index) {
-    pageController.jumpToPage(index);
-  });
-  super.initState();
-}
-
-@override
-Widget build(BuildContext context) {
-  return Row(
-    mainAxisAlignment: MainAxisAlignment.start,
-    children: [
-      SideMenu(
-        // Page controller to manage a PageView
-        controller: sideMenu,
-        // Will shows on top of all items, it can be a logo or a Title text
-        title: Image.asset('assets/images/easy_sidemenu.png'),
-        // Will show on bottom of SideMenu when displayMode was SideMenuDisplayMode.open
-        footer: Text('demo'),
-        // Notify when display mode changed
-        onDisplayModeChanged: (mode) {
-          print(mode);
-        },
-        // List of SideMenuItem to show them on SideMenu
-        items: items,
-      ),
-      Expanded(
-        child: PageView(
-          controller: pageController,
-          children: [
-            Container(
-              child: Center(
-                child: Text('Dashboard'),
-              ),
+PageController page = PageController();
+Row(
+  mainAxisAlignment: MainAxisAlignment.start,
+  children: [
+    SideMenu(
+      // Page controller to manage a PageView
+      controller: page,
+      // Will shows on top of all items, it can be a logo or a Title text
+      title: Image.asset('assets/images/easy_sidemenu.png'),
+      // Will show on bottom of SideMenu when displayMode was SideMenuDisplayMode.open
+      footer: Text('demo'),
+      // Notify when display mode changed
+      onDisplayModeChanged: (mode) {
+        print(mode);
+      },
+      // List of SideMenuItem to show them on SideMenu
+      items: items,
+    ),
+    Expanded(
+      child: PageView(
+        controller: page,
+        children: [
+          Container(
+            child: Center(
+              child: Text('Dashboard'),
             ),
-            Container(
-              child: Center(
-                child: Text('Settings'),
-              ),
+          ),
+          Container(
+            child: Center(
+              child: Text('Settings'),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
-    ],
-  );
-}
+    ),
+  ],
+),
 ```
 
 ### Style
@@ -170,18 +148,10 @@ style: SideMenuStyle(
   selectedTitleTextStyle: TextStyle(color: Colors.white),
   unselectedTitleTextStyle: TextStyle(color: Colors.black54),
   iconSize: 20,
-  itemBorderRadius: const BorderRadius.all(
-      Radius.circular(5.0),
-  ),
-  showTooltip: true,
-  itemHeight: 50.0,
-  itemInnerSpacing: 8.0,
-  itemOuterPadding: const EdgeInsets.symmetric(horizontal: 5.0),
-  toggleColor: Colors.black54
 ),
 ```
 
-#### Style Example
+#### Example style
 
 <details>
 <summary>Code</summary>
@@ -231,11 +201,6 @@ style: SideMenuStyle(
 | unselectedTitleTextStyle |      `TextStyle?`      |                  Style of `title` text when item is unselected                  |
 | iconSize                 |       `double?`        |                         Size of icon on `SideMenuItem`                          |
 | toggleColor              |        `Color?`        |                             Color of toggle button                              |
-| itemBorderRadius         |     `BorderRadius`     |                           Border Radius of menu item                            |
-| showTooltip              |         `bool`         |Property that will show user itemName in Tooltip when they'll hover over the item|
-| itemInnerSpacing         |        `double`        |                           Inner spacing of menu item                            |
-| itemOuterPadding         |  `EdgeInsetsGeometry`  |                           Outer padding of menu item                            |
-| itemHeight               |        `double`        |                              Height of menu item                                |
 
 ---
 
