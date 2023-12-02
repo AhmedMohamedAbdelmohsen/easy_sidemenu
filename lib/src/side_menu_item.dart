@@ -1,4 +1,4 @@
-import 'package:badges/badges.dart' as Badge;
+import 'package:badges/badges.dart';
 import 'package:easy_sidemenu/src/global/global.dart';
 import 'package:easy_sidemenu/src/side_menu_display_mode.dart';
 
